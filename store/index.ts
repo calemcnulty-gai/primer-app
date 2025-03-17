@@ -12,8 +12,10 @@ import {
 } from 'redux-persist';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Import reducers
-// Add your reducers here
+// Dummy reducer to fix "Store does not have a valid reducer" error
+const dummyReducer = (state = {}, action: any) => {
+  return state;
+};
 
 // Configure redux-persist
 const persistConfig = {
@@ -25,6 +27,7 @@ const persistConfig = {
 // Combine reducers
 const rootReducer = combineReducers({
   // Add your reducers here
+  dummy: dummyReducer
 });
 
 // Create persisted reducer

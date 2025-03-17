@@ -1,26 +1,22 @@
 /**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
+ * Below are the colors for the e-ink themed app with a monochrome, sepia feel.
+ * The colors are designed to mimic an e-reader experience with a warm, paper-like appearance.
  * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
  */
 
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
+// E-ink sepia tones
+const paperLight = '#f8f3e8'; // Light sepia paper color
+const paperDark = '#e8e1d9';  // Slightly darker sepia
+const inkColor = '#5b4636';   // Dark brown ink color
+const accentSepia = '#b38a5b'; // Warm accent color
 
 export const Colors = {
-  light: {
-    text: '#11181C',
-    background: '#fff',
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
-  },
-  dark: {
-    text: '#ECEDEE',
-    background: '#151718',
-    tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
-  },
+  text: inkColor,
+  background: paperLight,
+  tint: accentSepia,
+  icon: '#8a7b6b',
+  tabIconDefault: '#8a7b6b',
+  tabIconSelected: inkColor,
+  paperTexture: paperDark,  // For subtle texture elements
+  separator: '#d9d0c1',     // Subtle separator color
 };

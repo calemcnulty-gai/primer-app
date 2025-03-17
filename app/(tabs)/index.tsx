@@ -6,9 +6,12 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 
 export default function HomeScreen() {
+  // E-ink theme header color
+  const einkHeaderColor = '#d9d0c1'; // Sepia separator color
+
   return (
     <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
+      headerBackgroundColor={einkHeaderColor}
       headerImage={
         <Image
           source={require('@/assets/images/partial-react-logo.png')}
@@ -16,8 +19,15 @@ export default function HomeScreen() {
         />
       }>
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
+        <ThemedText type="title">E-ink Theme</ThemedText>
         <HelloWave />
+      </ThemedView>
+      
+      <ThemedView style={styles.stepContainer} variant="card">
+        <ThemedText type="subtitle">Paper-like Experience</ThemedText>
+        <ThemedText>
+          This e-ink theme provides a monochrome, sepia-toned experience that resembles reading on paper or an e-reader.
+        </ThemedText>
       </ThemedView>
       
       <ThemedView style={styles.stepContainer}>
@@ -35,13 +45,15 @@ export default function HomeScreen() {
           to open developer tools.
         </ThemedText>
       </ThemedView>
-      <ThemedView style={styles.stepContainer}>
+      
+      <ThemedView style={styles.stepContainer} variant="paper">
         <ThemedText type="subtitle">Step 2: Explore</ThemedText>
         <ThemedText>
           Tap the Explore tab to learn more about what's included in this starter app.
         </ThemedText>
       </ThemedView>
-      <ThemedView style={styles.stepContainer}>
+      
+      <ThemedView style={styles.stepContainer} variant="card">
         <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
         <ThemedText>
           When you're ready, run{' '}
@@ -60,10 +72,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
+    marginBottom: 16,
   },
   stepContainer: {
     gap: 8,
-    marginBottom: 8,
+    marginBottom: 16,
   },
   reactLogo: {
     height: 178,
@@ -71,5 +84,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     position: 'absolute',
+    opacity: 0.8, // Slightly faded for e-ink feel
   },
 });
