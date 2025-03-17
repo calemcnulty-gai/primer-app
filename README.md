@@ -25,6 +25,29 @@ In the output, you'll find options to open the app in a
 
 You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
 
+## Project Structure
+
+This project follows a standard directory structure:
+
+```
+project_root/
+ |-- .cursor/              # Cursor AI assistant configuration
+ |     |-- rules/          # Composable rules for Cursor
+ |     |-- project_plan.md # Task tracking
+ |     |-- changelog.md    # Project changes log
+ |
+ |-- app/                  # Main application code
+ |-- components/           # Reusable components
+ |-- constants/            # Application constants
+ |-- hooks/                # Custom React hooks
+ |-- assets/               # Static assets
+ |-- README.md             # This file
+```
+
+## Cursor Rules
+
+This project uses a composable rule system for the Cursor AI assistant following Geoffrey Huntley's approach from [https://ghuntley.com/stdlib/](https://ghuntley.com/stdlib/). Rules are stored in `.cursor/rules/` and can be included in custom instructions using `@file:.cursor/rules/main.mdc`.
+
 ## Get a fresh project
 
 When you're ready, run:
