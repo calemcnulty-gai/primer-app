@@ -12,7 +12,9 @@
 ### Core Features
 - [ ] Implement navigation system
 - [ ] Create core UI components
-- [ ] Implement state management
+- [x] Implement state management with Redux
+- [x] Configure Redux store with persistence
+- [x] Create sample Redux slice (Counter)
 - [ ] Set up API integration
 - [ ] Implement authentication
 
