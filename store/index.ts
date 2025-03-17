@@ -13,18 +13,18 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Import reducers
-import counterReducer from './slices/counterSlice';
+// Add your reducers here
 
 // Configure redux-persist
 const persistConfig = {
   key: 'root',
   storage: AsyncStorage,
-  whitelist: ['counter'] // Add slices that need to be persisted
+  whitelist: [] // Add slices that need to be persisted
 };
 
 // Combine reducers
 const rootReducer = combineReducers({
-  counter: counterReducer,
+  // Add your reducers here
 });
 
 // Create persisted reducer

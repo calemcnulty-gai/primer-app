@@ -14,7 +14,7 @@
 - [ ] Create core UI components
 - [x] Implement state management with Redux
 - [x] Configure Redux store with persistence
-- [x] Create sample Redux slice (Counter)
+- [x] Set up clean Redux architecture
 - [ ] Set up API integration
 - [ ] Implement authentication
 

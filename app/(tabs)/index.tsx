@@ -4,7 +4,6 @@ import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { Counter } from '@/components/Counter';
 
 export default function HomeScreen() {
   return (
@@ -19,11 +18,6 @@ export default function HomeScreen() {
       <ThemedView style={styles.titleContainer}>
         <ThemedText type="title">Welcome!</ThemedText>
         <HelloWave />
-      </ThemedView>
-      
-      <ThemedView style={styles.counterContainer}>
-        <ThemedText type="subtitle">Redux Counter Example</ThemedText>
-        <Counter />
       </ThemedView>
       
       <ThemedView style={styles.stepContainer}>
@@ -66,10 +60,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-  },
-  counterContainer: {
-    gap: 8,
-    marginVertical: 16,
   },
   stepContainer: {
     gap: 8,
