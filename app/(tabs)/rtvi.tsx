@@ -1,13 +1,13 @@
 import { StyleSheet } from 'react-native';
-import { StoryPage } from '@/components/StoryPage';
+import { RtviChat } from '@/components/RtviChat';
 import { ThemedView } from '@/components/ThemedView';
 import ErrorBoundary from '@/components/ErrorBoundary';
 
-export default function HomeScreen() {
+export default function RtviScreen() {
   return (
     <ErrorBoundary>
       <ThemedView style={styles.container}>
-        <StoryPage />
+        <RtviChat />
       </ThemedView>
     </ErrorBoundary>
   );

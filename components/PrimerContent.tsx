@@ -1,32 +1,30 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import { useTheme } from '@/theme/ThemeProvider';
 import { ThemedText } from '@/components/ThemedText';
-
-// Placeholder function for API calls - would be replaced with actual API integration
-const fetchContent = async () => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-  
-  // Return placeholder content
-  return {
-    title: "Chapter One",
-    content: "Once upon a time, in a land both distant and near, a young girl discovered a most unusual book. The book was not like any other she had encountered before—its pages seemed to know her thoughts before she thought them, and it told stories that unfolded precisely as she needed them to.\n\nThe book was bound in leather that felt warm to the touch, embossed with intricate patterns that seemed to shift when viewed from different angles. Its pages were neither paper nor parchment, but something finer, like silk spun from knowledge itself.\n\n\"Welcome,\" the book seemed to whisper, though no sound emerged from its pages. \"I have been waiting for you.\""
-  };
-};
+import api from '@/services/api';
 
 export function PrimerContent() {
   const { colors } = useTheme();
   const [content, setContent] = useState<{ title: string; content: string } | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadContent = async () => {
       try {
-        const data = await fetchContent();
+        setLoading(true);
+        const data = await api.content.getContent();
         setContent(data);
-      } catch (error) {
-        console.error('Error loading content:', error);
+        setError(null);
+      } catch (err) {
+        console.error('Error loading content:', err);
+        setError('Failed to load your story. Please try again.');
+        // Fallback content in case API fails
+        setContent({
+          title: "Chapter One",
+          content: "Once upon a time, in a land both distant and near, a young girl discovered a most unusual book. The book was not like any other she had encountered before—its pages seemed to know her thoughts before she thought them, and it told stories that unfolded precisely as she needed them to.\n\nThe book was bound in leather that felt warm to the touch, embossed with intricate patterns that seemed to shift when viewed from different angles. Its pages were neither paper nor parchment, but something finer, like silk spun from knowledge itself.\n\n\"Welcome,\" the book seemed to whisper, though no sound emerged from its pages. \"I have been waiting for you.\""
+        });
       } finally {
         setLoading(false);
       }
@@ -37,8 +35,9 @@ export function PrimerContent() {
 
   if (loading) {
     return (
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <ThemedText>Loading your story...</ThemedText>
+      <View style={[styles.container, styles.loadingContainer, { backgroundColor: colors.background }]}>
+        <ActivityIndicator size="large" color={colors.tint} />
+        <ThemedText style={styles.loadingText}>Opening your primer...</ThemedText>
       </View>
     );
   }
@@ -46,6 +45,11 @@ export function PrimerContent() {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
+        {error && (
+          <View style={styles.errorContainer}>
+            <ThemedText style={styles.errorText}>{error}</ThemedText>
+          </View>
+        )}
         <View style={styles.pageContainer}>
           <View style={[styles.pageContent, { backgroundColor: colors.paperTexture }]}>
             {content && (
@@ -65,6 +69,26 @@ export function PrimerContent() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  loadingContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+  },
+  errorContainer: {
+    padding: 16,
+    marginBottom: 16,
+    backgroundColor: '#f8d7da',
+    borderWidth: 1,
+    borderColor: '#f5c6cb',
+    borderRadius: 4,
+  },
+  errorText: {
+    color: '#721c24',
+    textAlign: 'center',
   },
   scrollContent: {
     flexGrow: 1,

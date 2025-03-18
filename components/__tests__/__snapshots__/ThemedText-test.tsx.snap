@@ -5,9 +5,10 @@ exports[`renders correctly 1`] = `
   style={
     [
       {
-        "color": "#11181C",
+        "color": "#5b4636",
       },
       {
+        "fontFamily": "SpaceMono",
         "fontSize": 16,
         "lineHeight": 24,
       },
