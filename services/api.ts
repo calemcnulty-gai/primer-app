@@ -2,55 +2,109 @@ import Constants from 'expo-constants';
 import { Alert, Platform } from 'react-native';
 import * as Application from 'expo-application';
 
-// API base URL from Expo constants
-// For iOS simulator, localhost on the Mac is available as localhost:3000
-// For Android emulator, use 10.0.2.2:3000 to access host's localhost
+// We need to handle special cases for the --localhost flag
+// When using this flag, Expo Dev Server replaces 'localhost' with the actual LAN IP
+// of your machine (e.g. 192.168.1.x or 10.10.1.x)
 const getDevApiUrl = () => {
+  // For development mode, use environment-specific URL
   if (Platform.OS === 'ios') {
+    // iOS simulator can use localhost directly
     return 'http://localhost:3000';
   } else if (Platform.OS === 'android') {
-    return 'http://10.0.2.2:3000';
+    try {
+      // Check for explicit API_URL in Constants first
+      if (Constants.expoConfig?.extra?.androidApiUrl) {
+        const url = Constants.expoConfig.extra.androidApiUrl;
+        console.log('[API] Using Android API URL from config:', url);
+        return url;
+      }
+      
+      // When using --localhost flag with Android, Expo automatically 
+      // replaces localhost in URLs with your machine's actual LAN IP address
+      // So we can safely use localhost here
+      console.log('[API] Using localhost for Android with --localhost flag');
+      return 'http://localhost:3000';
+    } catch (error) {
+      console.error('[API] Error getting Android API URL:', error);
+      console.log('[API] Using fallback Android API URL: http://localhost:3000');
+      return 'http://localhost:3000';
+    }
   } else {
+    // Web platform
     return 'http://localhost:3000';
   }
 };
 
-const API_URL = Constants.expoConfig?.extra?.apiUrl || getDevApiUrl();
+// Get API URL with enhanced logging
+const getApiUrl = () => {
+  // In production, use the configured API URL
+  if (Constants.expoConfig?.extra?.environment === 'production') {
+    const prodUrl = Constants.expoConfig?.extra?.apiUrl || '';
+    console.log(`[API] Using production API URL: ${prodUrl}`);
+    return prodUrl;
+  }
+  
+  // In development, get the appropriate dev URL
+  const devUrl = getDevApiUrl();
+  console.log(`[API] Using development API URL: ${devUrl} on ${Platform.OS}`);
+  return devUrl;
+};
+
+const API_URL = getApiUrl();
 
 // Add retry logic for network operations (especially important for Android)
-const fetchWithRetry = async (url: string, options: RequestInit = {}, retries = 3, delay = 1000): Promise<Response> => {
-  try {
-    return await fetch(url, options);
-  } catch (error) {
-    if (retries <= 1) throw error;
-    
-    // Wait for the specified delay
-    await new Promise(resolve => setTimeout(resolve, delay));
-    
-    // Retry with one less retry remaining
-    return fetchWithRetry(url, options, retries - 1, delay * 1.5);
+const fetchWithRetry = async (url: string, options: RequestInit = {}, retries = 5, delay = 500): Promise<Response> => {
+  let lastError;
+  
+  for (let attempt = 0; attempt < retries; attempt++) {
+    try {
+      console.log(`[API] Fetch attempt ${attempt + 1}/${retries} for ${url}`);
+      const response = await fetch(url, options);
+      console.log(`[API] Fetch successful on attempt ${attempt + 1}`);
+      return response;
+    } catch (error) {
+      lastError = error;
+      console.error(`[API] Fetch attempt ${attempt + 1} failed:`, error);
+      
+      if (attempt === retries - 1) {
+        console.error(`[API] All ${retries} retry attempts failed for ${url}`);
+        break;
+      }
+      
+      const waitTime = delay * Math.pow(1.5, attempt);
+      console.log(`[API] Waiting ${waitTime}ms before retry ${attempt + 2}`);
+      await new Promise(resolve => setTimeout(resolve, waitTime));
+    }
   }
+  
+  throw lastError;
 };
 
 // Get device ID for API requests
 const getDeviceId = async (): Promise<string> => {
   let deviceId = '';
 
-  if (Platform.OS === 'ios') {
-    deviceId = await Application.getIosIdForVendorAsync() || '';
-  } else if (Platform.OS === 'android') {
-    deviceId = await Application.getAndroidId() || '';
-  } else {
-    // Web platform - generate a consistent ID and store in localStorage
-    const storedId = localStorage.getItem('deviceId');
-    if (storedId) {
-      deviceId = storedId;
+  try {
+    if (Platform.OS === 'ios') {
+      deviceId = await Application.getIosIdForVendorAsync() || '';
+    } else if (Platform.OS === 'android') {
+      deviceId = await Application.getAndroidId() || '';
     } else {
-      deviceId = `web-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
-      localStorage.setItem('deviceId', deviceId);
+      // Web platform - generate a consistent ID and store in localStorage
+      const storedId = localStorage.getItem('deviceId');
+      if (storedId) {
+        deviceId = storedId;
+      } else {
+        deviceId = `web-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
+        localStorage.setItem('deviceId', deviceId);
+      }
     }
+  } catch (error) {
+    console.error('[API] Error getting device ID:', error);
+    deviceId = `fallback-${Platform.OS}-${Date.now()}`;
   }
 
+  console.log(`[API] Using device ID: ${deviceId.substring(0, 8)}...`);
   return deviceId;
 };
 
@@ -74,7 +128,7 @@ async function apiFetch<T>(
 
     // Log request in development
     if (Constants.expoConfig?.extra?.environment === 'development') {
-      console.log(`API Request: ${API_URL}${endpoint}`, {
+      console.log(`[API] Request: ${API_URL}${endpoint}`, {
         method: mergedOptions.method || 'GET',
         headers: mergedOptions.headers,
         body: mergedOptions.body ? JSON.parse(mergedOptions.body as string) : undefined
@@ -86,7 +140,7 @@ async function apiFetch<T>(
     
     // Log raw response in development
     if (Constants.expoConfig?.extra?.environment === 'development') {
-      console.log(`API Raw Response: ${API_URL}${endpoint}`, {
+      console.log(`[API] Raw Response: ${API_URL}${endpoint}`, {
         status: response.status,
         statusText: response.statusText,
         headers: Object.fromEntries([...response.headers.entries()])
@@ -96,7 +150,7 @@ async function apiFetch<T>(
     // Check for non-JSON responses or HTML error pages
     const contentType = response.headers.get('content-type');
     if (contentType && !contentType.includes('application/json')) {
-      console.error(`Received non-JSON response with content type: ${contentType}`);
+      console.error(`[API] Received non-JSON response with content type: ${contentType}`);
       throw new Error(`Unexpected response type: ${contentType}`);
     }
     
@@ -105,7 +159,7 @@ async function apiFetch<T>(
     
     // Log parsed response in development
     if (Constants.expoConfig?.extra?.environment === 'development') {
-      console.log(`API Response Data: ${API_URL}${endpoint}`, data);
+      console.log(`[API] Response Data: ${API_URL}${endpoint}`, data);
     }
     
     // Check if response is ok
@@ -115,27 +169,55 @@ async function apiFetch<T>(
     
     return data as T;
   } catch (error) {
-    console.error('API request error:', error);
+    console.error('[API] Request error:', error);
     
     // Add more detailed info to help debug connection issues
     if (error instanceof TypeError && error.message.includes('Network request failed')) {
-      console.error(`Network request failed to ${API_URL}${endpoint}. Make sure your API server is running at ${API_URL}.`);
+      console.error(`[API] Network request failed to ${API_URL}${endpoint}. Make sure your API server is running at ${API_URL}.`);
+      
+      // Additional helpful message for --localhost specific issues
+      if (API_URL.includes('localhost')) {
+        console.error(`
+[API] When using --localhost flag:
+1. Ensure your API server is running and bound to 0.0.0.0 (all interfaces), not just 127.0.0.1
+2. Check that your computer's firewall allows incoming connections on port 3000
+3. Verify that both your device and computer are on the same network
+4. Your actual API URL on the device will be something like http://YOUR_COMPUTER_IP:3000`);
+      }
     }
     
     // Platform-specific error handling
     if (Platform.OS === 'android') {
-      // On Android, some network errors might happen during initial startup
-      // Return a graceful fallback instead of crashing
+      // On Android, provide a graceful fallback for network errors
       if (endpoint.includes('/rtvi/conversation')) {
-        console.log('Returning empty conversation for Android due to network error');
+        console.log('[API] Returning empty conversation for Android due to network error');
         return { 
           success: true, 
           conversation: [],
           message: {
             id: 'system-message',
-            content: 'Connection temporarily unavailable. Please try again.',
+            content: 'Connection temporarily unavailable. Please try again when your network connection improves.',
             timestamp: new Date().toISOString(),
             fromUser: false
+          }
+        } as unknown as T;
+      } else if (endpoint.includes('/story/current')) {
+        console.log('[API] Returning fallback story segment for Android due to network error');
+        return {
+          success: true,
+          segment: {
+            id: 'fallback-segment',
+            content: 'Unable to connect to the story server. Please check your internet connection and try again.',
+            choices: [{ id: 'retry', text: 'Retry Connection' }]
+          },
+          state: {
+            userId: deviceId || 'unknown',
+            currentSegmentId: 'fallback-segment',
+            progress: 0,
+            contextualData: {},
+            readSegments: [],
+            isConversationalMode: false,
+            recentConversation: []
           }
         } as unknown as T;
       }
@@ -148,9 +230,13 @@ async function apiFetch<T>(
         errorMessage = error.message;
         if (error.message.includes('Network request failed')) {
           errorMessage += `\n\nMake sure your API server is running at ${API_URL}`;
+          
+          if (API_URL.includes('localhost')) {
+            errorMessage += `\n\nWith --localhost flag, your API server must be bound to 0.0.0.0:3000, not just localhost:3000`;
+          }
         }
       }
-      Alert.alert('API Error', errorMessage);
+      Alert.alert('[API] Error', errorMessage);
     }
     
     throw error;

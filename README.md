@@ -40,9 +40,43 @@ project_root/
  |-- components/           # Reusable components
  |-- constants/            # Application constants
  |-- hooks/                # Custom React hooks
+ |-- services/             # API services including PipeCat client
+ |-- store/                # Redux store configuration
  |-- assets/               # Static assets
  |-- README.md             # This file
 ```
+
+## PipeCat Integration
+
+This app includes integration with the PipeCat API for AI chat functionality:
+
+### Configuration
+
+1. Set your PipeCat API key in app.config.js:
+
+```javascript
+// In app.config.js, edit the extra section
+extra: {
+  // ...other config
+  pipecatApiKey: process.env.PIPECAT_API_KEY || "your-api-key-here"
+}
+```
+
+2. Alternatively, set the API key as an environment variable when starting the app:
+
+```bash
+PIPECAT_API_KEY=your-api-key-here npx expo start
+```
+
+### Usage
+
+The PipeCat chat feature is available in the "RTVI" tab of the application. It provides:
+
+- Real-time chat with an AI assistant
+- Persistent conversation history
+- New conversation functionality
+
+For local development, the app expects the PipeCat API server to be running at `http://localhost:8000`. See LOCALHOST_GUIDE.md for more details on running with local servers.
 
 ## Cursor Rules
 

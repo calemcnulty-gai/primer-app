@@ -4,12 +4,17 @@
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
-    "start:dev": "APP_ENV=development expo start",
-    "start:prod": "APP_ENV=production expo start",
+    "start:dev": "APP_ENV=development expo start --localhost",
+    "start:prod": "APP_ENV=production expo start --localhost",
     "build:dev": "APP_ENV=development expo build",
     "build:prod": "APP_ENV=production expo build",
     "reset-project": "node ./scripts/reset-project.js",
-    "android": "expo start --android",
+    "clear-cache": "node ./scripts/clear-cache.js",
+    "start:clean": "npm run clear-cache && APP_ENV=development expo start --clear",
+    "android": "APP_ENV=development expo start --android --localhost",
+    "android:clean": "npm run clear-cache && APP_ENV=development expo start --android --localhost --clear",
+    "api:start": "node ./scripts/start-api-server.js",
+    "dev": "concurrently \"npm run api:start\" \"npm run android:clean\" --kill-others",
     "ios": "expo start --ios",
     "web": "expo start --web",
     "test": "jest",
@@ -19,19 +24,25 @@
     "preset": "jest-expo"
   },
   "dependencies": {
+    "@config-plugins/react-native-webrtc": "^10.0.0",
+    "@daily-co/config-plugin-rn-daily-js": "^0.0.7",
+    "@daily-co/react-native-daily-js": "^0.73.0",
+    "@daily-co/react-native-webrtc": "^118.0.3-daily.2",
     "@expo/vector-icons": "^14.0.2",
+    "@pipecat-ai/react-native-daily-transport": "^0.3.2",
     "@react-native-async-storage/async-storage": "1.23.1",
     "@react-navigation/bottom-tabs": "^7.2.0",
     "@react-navigation/native": "^7.0.14",
     "@reduxjs/toolkit": "^2.6.1",
     "expo": "~52.0.38",
-    "expo-application": "~5.8.2",
+    "expo-application": "~6.0.2",
+    "expo-av": "~15.0.2",
     "expo-blur": "~14.0.3",
     "expo-constants": "~17.0.8",
     "expo-font": "~13.0.4",
     "expo-haptics": "~14.0.1",
     "expo-linking": "~7.0.5",
-    "expo-router": "~4.0.18",
+    "expo-router": "~4.0.19",
     "expo-splash-screen": "~0.29.22",
     "expo-status-bar": "~2.0.1",
     "expo-symbols": "~0.2.2",
@@ -47,18 +58,27 @@
     "react-native-web": "~0.19.13",
     "react-native-webview": "13.12.5",
     "react-redux": "^9.2.0",
-    "redux-persist": "^6.0.0",
-    "expo-av": "~15.0.2"
+    "redux-persist": "^6.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@types/jest": "^29.5.12",
     "@types/react": "~18.3.12",
     "@types/react-test-renderer": "^18.3.0",
+    "concurrently": "^8.2.2",
     "jest": "^29.2.1",
     "jest-expo": "~52.0.6",
     "react-test-renderer": "18.3.1",
     "typescript": "^5.3.3"
+  },
+  "expo": {
+    "doctor": {
+      "reactNativeDirectoryCheck": {
+        "exclude": [
+          "redux-persist"
+        ]
+      }
+    }
   },
   "private": true
 }

@@ -28,7 +28,11 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#f8f3e8"
       },
-      "permissions": ["RECORD_AUDIO"]
+      "permissions": ["RECORD_AUDIO", "INTERNET"],
+      "config": {
+        "cleartextTraffic": true
+      },
+      "package": "com.calemcnulty.primerapp"
     },
     "web": {
       "bundler": "metro",
@@ -46,6 +50,20 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "apiUrl": "https://primer.calemcnulty.com",
+      "androidApiUrl": "https://primer.calemcnulty.com",
+      "environment": "production",
+      "apiNote": "When using --localhost flag, 'localhost' is automatically replaced with the host machine's IP",
+      "pipecatApiUrl": "https://api.pipecat.ai",
+      "pipecatApiKey": ""
+    },
+    "updates": {
+      "enabled": false,
+      "checkAutomatically": "ON_ERROR_RECOVERY",
+      "fallbackToCacheTimeout": 0,
+      "url": ""
     }
   }
 }
