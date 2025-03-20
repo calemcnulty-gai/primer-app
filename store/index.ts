@@ -21,19 +21,21 @@ const dummyReducer = (state = {}, action: any) => {
 const persistConfig = {
   key: 'root',
   storage: AsyncStorage,
-  whitelist: ['story', 'rtvi'] // Persist story and rtvi state between app sessions
+  whitelist: ['story', 'rtvi', 'voice'] // Persist story, rtvi, and voice state between app sessions
 };
 
 // Import reducers
 import storyReducer from './slices/storySlice';
 import rtviReducer from './slices/rtviSlice';
+import voiceReducer from './slices/voiceSlice';
 
 // Combine reducers
 const rootReducer = combineReducers({
   // Add your reducers here
   dummy: dummyReducer,
   story: storyReducer,
-  rtvi: rtviReducer
+  rtvi: rtviReducer,
+  voice: voiceReducer
 });
 
 // Create persisted reducer

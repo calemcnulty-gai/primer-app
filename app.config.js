@@ -1,17 +1,10 @@
 const isProd = process.env.APP_ENV === 'production';
 
-// For Android with the --localhost flag, we use a consistent approach
-// The Expo Dev server will automatically replace 'localhost' with your
-// machine's IP address (like 192.168.x.x) when sending to the device
-const DEV_API_URL = 'http://localhost:3000';
-const PROD_API_URL = 'https://primer.calemcnulty.com';
+// Always use production URLs
+const API_URL = 'https://primer.calemcnulty.com';
 
-// PipeCat API URLs
-const PIPECAT_DEV_API_URL = 'http://localhost:8000';
-const PIPECAT_PROD_API_URL = 'https://api.pipecat.ai';
-
-// Get the PipeCat API key from environment or use a placeholder
-const PIPECAT_API_KEY = process.env.PIPECAT_API_KEY || '';
+// Voice API URLs
+const VOICE_API_URL = 'wss://primer.calemcnulty.com/api/v1/voice';
 
 module.exports = {
   expo: {
@@ -33,9 +26,11 @@ module.exports = {
       "**/*"
     ],
     ios: {
+      bundleIdentifier: "com.calemcnulty.primerapp",
       supportsTablet: true,
       infoPlist: {
-        NSMicrophoneUsageDescription: "This app uses the microphone for voice interaction with your Primer."
+        NSMicrophoneUsageDescription: "This app uses the microphone for voice interaction with your Primer.",
+        NSCameraUsageDescription: "This app uses the camera for WebRTC communication."
       }
     },
     android: {
@@ -43,7 +38,12 @@ module.exports = {
         foregroundImage: "./assets/images/adaptive-icon.png",
         backgroundColor: "#f8f3e8"
       },
-      permissions: ["RECORD_AUDIO", "INTERNET"],
+      permissions: [
+        "RECORD_AUDIO", 
+        "INTERNET",
+        "CAMERA",
+        "MODIFY_AUDIO_SETTINGS"
+      ],
       config: {
         cleartextTraffic: true
       },
@@ -61,20 +61,18 @@ module.exports = {
         {
           "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone for voice interaction."
         }
-      ]
+      ],
+      "@config-plugins/react-native-webrtc"
     ],
     experiments: {
       typedRoutes: true
     },
     extra: {
-      apiUrl: isProd ? PROD_API_URL : DEV_API_URL,
-      androidApiUrl: isProd ? PROD_API_URL : DEV_API_URL,
+      apiUrl: API_URL,
+      androidApiUrl: API_URL,
       environment: isProd ? "production" : "development",
-      // Add a comment to remind about --localhost behavior
-      apiNote: "When using --localhost flag, 'localhost' is automatically replaced with the host machine's IP",
-      // PipeCat API configuration
-      pipecatApiUrl: isProd ? PIPECAT_PROD_API_URL : PIPECAT_DEV_API_URL,
-      pipecatApiKey: PIPECAT_API_KEY
+      // Voice API configuration
+      voiceApiUrl: VOICE_API_URL
     },
     updates: {
       enabled: false,

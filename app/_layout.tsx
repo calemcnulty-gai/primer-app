@@ -9,6 +9,8 @@ import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 
 import { ThemeProvider, useTheme } from '@/theme/ThemeProvider';
+import { VoiceProvider } from '@/context/VoiceContext';
+import VoiceIndicator from '@/components/VoiceIndicator';
 import { store, persistor } from '../store';
 import { Colors } from '@/constants/Colors';
 
@@ -58,12 +60,15 @@ export default function RootLayout() {
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <ThemeProvider>
-          <NavigationTheme>
-            <Stack screenOptions={{ headerShown: false, animation: 'fade' }}>
-              <Stack.Screen name="index" />
-            </Stack>
-            <StatusBar style="dark" />
-          </NavigationTheme>
+          <VoiceProvider>
+            <NavigationTheme>
+              <Stack screenOptions={{ headerShown: false, animation: 'fade' }}>
+                <Stack.Screen name="index" />
+              </Stack>
+              <StatusBar style="dark" />
+              <VoiceIndicator />
+            </NavigationTheme>
+          </VoiceProvider>
         </ThemeProvider>
       </PersistGate>
     </Provider>

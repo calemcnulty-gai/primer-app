@@ -2,9 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SplashScreen } from '@/components/SplashScreen';
-import { useTheme } from '@/theme/ThemeProvider';
+import { ThemeProvider, useTheme } from '@/theme/ThemeProvider';
 import { Redirect } from 'expo-router';
 import ErrorBoundary from '@/components/ErrorBoundary';
+import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
+import { store, persistor } from '../store';
 
 // import { RNDailyTransport } from '@pipecat-ai/react-native-daily-transport';
 // import { RTVIClient } from '@pipecat-ai/client-js';
@@ -27,7 +30,8 @@ import ErrorBoundary from '@/components/ErrorBoundary';
 
 // voiceClient.connect();
 
-export default function PrimerApp() {
+// Actual app content inside ThemeProvider
+function AppContent() {
   const { colors } = useTheme();
   const [showSplash, setShowSplash] = useState(true);
   const [readyToRedirect, setReadyToRedirect] = useState(false);
@@ -47,19 +51,28 @@ export default function PrimerApp() {
 
   // After splash screen, redirect to the tabbed interface with Story mode
   if (!showSplash && readyToRedirect) {
-    return (
-      <ErrorBoundary>
-        <Redirect href="/(tabs)" />
-      </ErrorBoundary>
-    );
+    return <Redirect href="/(tabs)" />;
   }
 
   return (
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <StatusBar style="dark" />
+      <SplashScreen onFinish={handleSplashFinish} />
+    </View>
+  );
+}
+
+// Main app component with proper providers
+export default function PrimerApp() {
+  return (
     <ErrorBoundary>
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <StatusBar style="dark" />
-        <SplashScreen onFinish={handleSplashFinish} />
-      </View>
+      <Provider store={store}>
+        <PersistGate loading={null} persistor={persistor}>
+          <ThemeProvider>
+            <AppContent />
+          </ThemeProvider>
+        </PersistGate>
+      </Provider>
     </ErrorBoundary>
   );
 }

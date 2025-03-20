@@ -9,6 +9,8 @@ const paperLight = '#f8f3e8'; // Light sepia paper color
 const paperDark = '#e8e1d9';  // Slightly darker sepia
 const inkColor = '#5b4636';   // Dark brown ink color
 const accentSepia = '#b38a5b'; // Warm accent color
+const errorColor = '#8B3A3A';  // Muted red for error states
+const successColor = '#3A623A'; // Muted green for success states
 
 export const Colors = {
   text: inkColor,
@@ -19,4 +21,8 @@ export const Colors = {
   tabIconSelected: inkColor,
   paperTexture: paperDark,  // For subtle texture elements
   separator: '#d9d0c1',     // Subtle separator color
+  error: errorColor,        // For error states
+  primary: accentSepia,     // Primary action color
+  success: successColor,    // Success state color
+  card: paperDark,          // Card background color
 };
